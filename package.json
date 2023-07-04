@@ -1,0 +1,47 @@
+{
+  "name": "powerpoint-generator",
+  "version": "1.0.0",
+  "description": "Generate a powerpoint based on a prompt",
+  "main": "index.js",
+  "type": "module",
+  "private": false,
+  "engines": {
+    "node": ">= 14.0.0",
+    "npm": ">= 6.0.0"
+  },
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": "",
+  "keywords": [],
+  "author": {
+    "name": "Henry Lagarde"
+  },
+  "contributors": [],
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/app.js",
+    "dev": "ts-node --esm ./src/app.ts"
+  },
+  "dependencies": {
+    "@pinecone-database/pinecone": "0.0.10",
+    "@types/node": "^18.15.10",
+    "@types/prompt-sync": "^4.2.0",
+    "dotenv": "16.0.3",
+    "js-yaml": "4.1.0",
+    "langchain": "0.0.102",
+    "openai": "3.2.1",
+    "pinecone": "0.1.0",
+    "pptxgenjs": "^3.12.0",
+    "prompt-sync": "^4.2.0",
+    "readline": "^1.3.0",
+    "serpapi": "1.1.1",
+    "typescript": "5.0.2"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.5",
+    "ts-node": "^10.9.1"
+  }
+}
