@@ -21,7 +21,7 @@ export class MyCallbackHandler extends BaseCallbackHandler {
     this.setChat = setChat;
   }
 
-  async handleChainStart(chain: Serialized, inputs: ChainValues) {
+  async handleChainStart(_chain: Serialized, inputs: ChainValues) {
     this.setChat((previousValue) =>
       previousValue.concat({ text: inputs["input"], type: "human" })
     );
@@ -59,7 +59,7 @@ export class MyCallbackHandler extends BaseCallbackHandler {
     );
   }
 
-  async handleToolEnd(output: string) {
+  async handleToolEnd(_output: string) {
     //console.log(`🤖 toolEnd: ${output}`);
   }
 
