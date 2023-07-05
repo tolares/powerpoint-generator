@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { BaseCallbackHandler } from "langchain/callbacks";
 import { Serialized } from "langchain/load/serializable";
 import {
@@ -13,9 +14,13 @@ import { Dispatch, SetStateAction } from "react";
 export class MyCallbackHandler extends BaseCallbackHandler {
   name = "MyCallbackHandler";
 
-  setChat: Dispatch<SetStateAction<{ text: string; type: MessageType }[]>>;
+  setChat: Dispatch<
+    SetStateAction<{ text: React.ReactNode; type: MessageType }[]>
+  >;
   constructor(
-    setChat: Dispatch<SetStateAction<{ text: string; type: MessageType }[]>>
+    setChat: Dispatch<
+      SetStateAction<{ text: React.ReactNode; type: MessageType }[]>
+    >
   ) {
     super();
     this.setChat = setChat;
@@ -55,7 +60,17 @@ export class MyCallbackHandler extends BaseCallbackHandler {
 
   async handleAgentAction(action: AgentAction) {
     this.setChat((previousValue) =>
-      previousValue.concat({ text: action.tool, type: "function" })
+      previousValue.concat({
+        text: (
+          <>
+            {action.tool} {/* @ts-ignore*/}
+            <pre style={{ "text-wrap": "wrap" }}>
+              {JSON.stringify(action.toolInput)}
+            </pre>
+          </>
+        ),
+        type: "function",
+      })
     );
   }
 

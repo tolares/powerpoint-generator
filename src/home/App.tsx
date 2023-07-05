@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useState } from "react";
-import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
+import reactLogo from "../assets/ppt.svg";
 import "./App.css";
-import { Button, Card, TextField } from "@mui/material";
+import { Button, Card, Grid, TextField, Typography } from "@mui/material";
 import { chain } from "../langchain/chain";
 import { MessageType } from "langchain/schema";
 
@@ -21,25 +21,29 @@ const convertMessageTypeToEmoji = (type: MessageType) => {
 
 function App() {
   const [theme, setTheme] = useState("");
-  const [chat, setChat] = useState<{ text: string; type: MessageType }[]>([]);
+  const [chat, setChat] = useState<
+    { text: React.ReactNode; type: MessageType }[]
+  >([]);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
+    <Grid container rowSpacing={2}>
+      <Grid item xs={12}>
+        <img src={reactLogo} className="logo react" alt="React logo" />
+      </Grid>
+      <Grid item xs={12}>
+        <Typography variant="h2" fontWeight={600}>
+          Powerpoint Generator
+        </Typography>
+      </Grid>
+      <Grid item xs={12}>
         <TextField
-          placeholder="Type in here…"
+          placeholder="Type your subject here"
           variant="outlined"
+          fullWidth
           onChange={(value) => setTheme(value.target.value)}
         />
+      </Grid>
+      <Grid item xs={12}>
         <Button
           variant="outlined"
           onClick={() => {
@@ -49,15 +53,25 @@ function App() {
         >
           Run generation
         </Button>
-      </div>
+      </Grid>
       {chat.map((item) => (
-        <Card sx={{ mt: 2, pY: 2, textAlign: "left" }}>
-          <pre>
-            {convertMessageTypeToEmoji(item.type)}:{item.text}
-          </pre>
-        </Card>
+        <Grid
+          container
+          rowSpacing={2}
+          direction={item.type === "human" ? "row" : "row-reverse"}
+        >
+          <Grid item xs={7}>
+            <Card
+              sx={{ mt: 2, pY: 2, textAlign: "left", backgroundColor: "grey" }}
+            >
+              {convertMessageTypeToEmoji(item.type)}
+              {/* @ts-ignore*/}
+              <pre style={{ "text-wrap": "wrap" }}>{item.text}</pre>
+            </Card>
+          </Grid>
+        </Grid>
       ))}
-    </>
+    </Grid>
   );
 }
 

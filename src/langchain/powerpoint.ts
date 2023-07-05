@@ -2,7 +2,14 @@ import PptxGenJS from "pptxgenjs";
 export const generatePPT = ({
   content,
 }: {
-  content?: { sections: { title: string; content: string[] }[] };
+  content?: {
+    sections: {
+      title: string;
+      content: string[];
+      sources?: { url: string; title: string }[];
+      images?: string[];
+    }[];
+  };
 }): string => {
   const pres = new PptxGenJS();
   // 2. Add a Slide
@@ -18,6 +25,15 @@ export const generatePPT = ({
     });
     slide.addText(textboxText, textboxOpts);
     slide.addText(bulletPoints, { x: 1, y: 2.2 });
+
+    if (section.sources) {
+      const links = section.sources?.map((link) => {
+        return {
+          text: `[Source: ${link.url}] ${link.title}`,
+        };
+      });
+      slide.addText(links, { x: 1, y: 3.2 });
+    }
   });
 
   pres.writeFile();
