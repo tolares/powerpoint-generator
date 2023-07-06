@@ -54,8 +54,9 @@ function App() {
           Run generation
         </Button>
       </Grid>
-      {chat.map((item) => (
+      {chat.map((item, index) => (
         <Grid
+          key={index}
           container
           rowSpacing={2}
           direction={item.type === "human" ? "row" : "row-reverse"}

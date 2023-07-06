@@ -52,7 +52,7 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
     }),
     {
       agentType: "openai-functions",
-      verbose: true,
+      verbose: false,
       callbacks: [new MyCallbackHandler(setChat)],
     }
   );
