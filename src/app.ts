@@ -8,7 +8,8 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 export const run = async () => {
-  const openAIResult = await chain();
+  //const openAIResult = await chain();
+  generatePPT({ content: undefined });
 };
 
 run();

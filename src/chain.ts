@@ -3,13 +3,10 @@ import { PromptTemplate } from "langchain/prompts";
 import * as dotenv from "dotenv";
 import prompt from "prompt-sync";
 import { DynamicTool, Serper } from "langchain/tools";
-import {
-  AgentExecutor,
-  ChatAgent,
-  initializeAgentExecutorWithOptions,
-} from "langchain/agents";
+import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { generatePPT } from "./powerpoint.js";
 import { Calculator } from "langchain/tools/calculator";
+import { MyCallbackHandler } from "./callback.js";
 
 dotenv.config();
 
@@ -32,7 +29,8 @@ export const chain = async () => {
     new ChatOpenAI({ modelName: "gpt-3.5-turbo-0613", temperature: 0 }),
     {
       agentType: "openai-functions",
-      verbose: true,
+      verbose: false,
+      callbacks: [new MyCallbackHandler()],
     }
   );
 
