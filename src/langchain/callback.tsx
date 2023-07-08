@@ -9,6 +9,7 @@ import {
   LLMResult,
   MessageType,
 } from "langchain/schema";
+import React from "react";
 import { Dispatch, SetStateAction } from "react";
 
 export class MyCallbackHandler extends BaseCallbackHandler {

@@ -5,6 +5,7 @@ import "./App.css";
 import { Button, Card, Grid, TextField, Typography } from "@mui/material";
 import { chain } from "../../langchain/chain";
 import { MessageType } from "langchain/schema";
+import React from "react";
 
 const convertMessageTypeToEmoji = (type: MessageType) => {
   switch (type) {
