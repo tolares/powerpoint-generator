@@ -8,6 +8,7 @@ import { Dispatch, SetStateAction } from "react";
 import { MessageType } from "langchain/schema";
 import * as dotenv from "dotenv";
 dotenv.config();
+
 const introSentence = `I am a school teacher.
   Search informations (you must include the links of your source) in order to create at least an introduction, 4 sections and a conclusion on the topic {subject}.
   Provide titles and include 3-5 bullet points which give a brief explanation of each title, develop each dot point for at least 150 words by including things like figures, context, sources etc. I want you to be precise.
