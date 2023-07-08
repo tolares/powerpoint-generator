@@ -42,7 +42,7 @@ Presentation.pptx
 # misc
 .DS_Store
 *.pem
-
+yarn.lock
 # debug
 npm-debug.log*
 yarn-debug.log*

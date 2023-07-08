@@ -3,7 +3,7 @@ import { useState } from "react";
 import "./Docs.css";
 import { Button, Card, Grid, TextField, Typography } from "@mui/material";
 import { MessageType } from "langchain/schema";
-import { documentChain } from "../../langchain/documentChain";
+import React from "react";
 
 const convertMessageTypeToEmoji = (type: MessageType) => {
   switch (type) {
@@ -42,9 +42,12 @@ function Docs() {
       <Grid item xs={12}>
         <Button
           variant="outlined"
-          onClick={() => {
+          onClick={async () => {
             setChat([]);
-            documentChain({ theme, setChat });
+            const result = await fetch(
+              `http://localhost:3000/documentation?theme=${theme}`
+            );
+            console.log(result.json());
           }}
         >
           Run generation
