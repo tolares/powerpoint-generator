@@ -58,7 +58,7 @@ function Docs() {
               previousValue.concat({ text: theme, type: "human" })
             );
             const result = await fetch(
-              `http://localhost:3000/documentation?theme=${theme}`
+              `https://powerpoint-generator.vercel.app/documentation?theme=${theme}`
             ).then((res) => res.json());
             console.log(result.sourceDocuments);
             setChat((previousValue) => previousValue.concat(result));
