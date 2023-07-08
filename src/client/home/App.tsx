@@ -3,7 +3,7 @@ import { useState } from "react";
 import reactLogo from "../../assets/ppt.svg";
 import "./App.css";
 import { Button, Card, Grid, TextField, Typography } from "@mui/material";
-import { chain } from "../../langchain/chain";
+import { chain } from "../../server/langchain/chain";
 import { MessageType } from "langchain/schema";
 import React from "react";
 

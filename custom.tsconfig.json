@@ -1,0 +1,14 @@
+{
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "esnext",
+    "types": ["node", "vite/client"],
+    "esModuleInterop": true
+  },
+  "include": ["vite.config.ts"]
+}

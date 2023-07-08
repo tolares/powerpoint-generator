@@ -6,8 +6,6 @@ import { generatePPT } from "./powerpoint.js";
 import { MyCallbackHandler } from "./callback.js";
 import { Dispatch, SetStateAction } from "react";
 import { MessageType } from "langchain/schema";
-import * as dotenv from "dotenv";
-dotenv.config();
 
 const introSentence = `I am a school teacher.
   Search informations (you must include the links of your source) in order to create at least an introduction, 4 sections and a conclusion on the topic {subject}.
@@ -26,7 +24,7 @@ type ChainProps = {
 };
 
 export const chain = async ({ theme, setChat }: ChainProps) => {
-  const search = new Serper(process.env.VITE_SERPER_API_KEY);
+  const search = new Serper(import.meta.env.VITE_SERPER_API_KEY);
   const powerpoint = new DynamicTool({
     name: "powerpoint_generator",
     description:
@@ -50,7 +48,7 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
     new ChatOpenAI({
       modelName: "gpt-3.5-turbo-0613",
       temperature: 0,
-      openAIApiKey: process.env.VITE_OPENAI_API_KEY,
+      openAIApiKey: import.meta.env.VITE_OPENAI_API_KEY,
     }),
     {
       agentType: "openai-functions",

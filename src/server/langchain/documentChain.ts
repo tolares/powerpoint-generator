@@ -3,10 +3,10 @@ import { PineconeStore } from "langchain/vectorstores/pinecone";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { VectorDBQAChain } from "langchain/chains";
 import { PromptTemplate } from "langchain/prompts";
-import * as dotenv from "dotenv";
 import { PineconeClient } from "@pinecone-database/pinecone";
+import * as dotenv from "dotenv";
+import { loadConfluence } from "./confluence";
 dotenv.config();
-
 type ChainProps = {
   theme: string;
 };
@@ -21,6 +21,7 @@ export const documentChain = async ({ theme }: ChainProps) => {
       "PINECONE_ENVIRONMENT and PINECONE_API_KEY and PINECONE_INDEX must be set"
     );
   }
+  const docs = await loadConfluence();
   const client = new PineconeClient();
   await client.init({
     apiKey: process.env.VITE_PINECONE_API_KEY,
@@ -36,9 +37,13 @@ export const documentChain = async ({ theme }: ChainProps) => {
     temperature: 0,
     openAIApiKey: process.env.VITE_OPENAI_API_KEY,
   });
-  const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
-    pineconeIndex: index,
-  });
+  const vectorStore = await PineconeStore.fromDocuments(
+    docs ?? [],
+    embeddings,
+    {
+      pineconeIndex: index,
+    }
+  );
   const prompt = PromptTemplate.fromTemplate("{topic}");
   const topic = await prompt.format({ topic: theme });
 
@@ -47,6 +52,11 @@ export const documentChain = async ({ theme }: ChainProps) => {
     returnSourceDocuments: true,
   });
   const response = await chain.call({ query: topic });
-  console.debug(response);
-  return [{ text: response.answer, type: "ai" }];
+  return [
+    {
+      text: response.text,
+      type: "ai",
+      sourceDocuments: response.sourceDocuments,
+    },
+  ];
 };

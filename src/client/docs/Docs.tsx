@@ -1,9 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useState } from "react";
 import "./Docs.css";
-import { Button, Card, Grid, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CircularProgress,
+  Grid,
+  Link,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { MessageType } from "langchain/schema";
 import React from "react";
+import { Document } from "langchain/dist/document";
 
 const convertMessageTypeToEmoji = (type: MessageType) => {
   switch (type) {
@@ -21,8 +30,9 @@ const convertMessageTypeToEmoji = (type: MessageType) => {
 function Docs() {
   const [theme, setTheme] = useState("");
   const [chat, setChat] = useState<
-    { text: React.ReactNode; type: MessageType }[]
+    { text: React.ReactNode; type: MessageType; sourceDocuments?: Document[] }[]
   >([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <Grid container rowSpacing={2}>
@@ -43,11 +53,16 @@ function Docs() {
         <Button
           variant="outlined"
           onClick={async () => {
-            setChat([]);
+            setIsLoading(true);
+            setChat((previousValue) =>
+              previousValue.concat({ text: theme, type: "human" })
+            );
             const result = await fetch(
               `http://localhost:3000/documentation?theme=${theme}`
-            );
-            console.log(result.json());
+            ).then((res) => res.json());
+            console.log(result.sourceDocuments);
+            setChat((previousValue) => previousValue.concat(result));
+            setIsLoading(false);
           }}
         >
           Run generation
@@ -62,15 +77,36 @@ function Docs() {
         >
           <Grid item xs={7}>
             <Card
-              sx={{ mt: 2, pY: 2, textAlign: "left", backgroundColor: "grey" }}
+              sx={{
+                mt: 2,
+                pY: 2,
+                textAlign: "left",
+                backgroundColor: "primary.light",
+              }}
             >
               {convertMessageTypeToEmoji(item.type)}
               {/* @ts-ignore*/}
-              <pre style={{ "text-wrap": "wrap" }}>{item.text}</pre>
+              <pre style={{ textWrap: "wrap" }}>{item.text}</pre>
+              {item.sourceDocuments?.map((document, index) => {
+                return (
+                  <Link
+                    color="success.dark"
+                    key={index}
+                    href={document.metadata.url}
+                  >
+                    {document.metadata.title} [From lines :{" "}
+                    {document.metadata["loc.lines.from"]} to{" "}
+                    {document.metadata["loc.lines.to"]}]
+                  </Link>
+                );
+              })}
             </Card>
           </Grid>
         </Grid>
       ))}
+      <Grid item xs={12} justifyContent="center">
+        {isLoading && <CircularProgress />}
+      </Grid>
     </Grid>
   );
 }
