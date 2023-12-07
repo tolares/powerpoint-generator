@@ -6,8 +6,8 @@ export const generatePPT = ({
     sections: {
       title: string;
       content: string[];
-      sources?: { url: string; title: string }[];
-      images?: string[];
+      sources: { url: string; title: string }[];
+      images: string[];
     }[];
   };
 }): string => {
