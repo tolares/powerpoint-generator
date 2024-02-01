@@ -2,30 +2,28 @@ import { ChatOpenAI } from "langchain/chat_models/openai";
 import {
   ChatPromptTemplate,
   HumanMessagePromptTemplate,
-  PromptTemplate,
+  MessagesPlaceholder,
+  SystemMessagePromptTemplate,
 } from "langchain/prompts";
 import { DynamicStructuredTool, DynamicTool, Serper } from "langchain/tools";
-import { initializeAgentExecutorWithOptions } from "langchain/agents";
+import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
 import { generatePPT } from "./powerpoint.js";
 import { MyCallbackHandler } from "./callback.js";
 import { Dispatch, SetStateAction } from "react";
-import { MessageType, SystemMessage } from "langchain/schema";
+import { MessageType } from "langchain/schema";
 import { z } from "zod";
 import { BufferMemory } from "langchain/memory";
 
-const systemMessage = new SystemMessage(`
+const systemMessage = SystemMessagePromptTemplate.fromTemplate(`
 You are an assistant for a school teacher.
-Search informations (you must include the links of your source) in order to create at least an introduction, 4 sections and a conclusion on the topic that the user will provide you.
+Search informations thanks to searper (you must include the links of your source) in order to create at least an introduction, 4 sections and a conclusion on the topic that the user will provide you.
   Provide titles and include 3-5 bullet points which give a brief explanation of each title, develop each dot point for at least 150 words by including things like figures, context, sources etc. I want you to be precise.
   Based on all the titles and dot points generate a powerpoint presentation you must include links to sources and links to images in the final powerpoint.
-`);
-const introSentence = `I would like to create a powerpoint presentation on the topic {subject}.`;
-const promptIntro = new HumanMessagePromptTemplate(
-  new PromptTemplate({
-    template: introSentence,
-    inputVariables: ["subject"],
-  })
-);
+  
+  You must provide at the end a powerpoint presentation
+  `);
+const introSentence = `I would like to create a powerpoint presentation on the topic {input}.`;
+const promptIntro = HumanMessagePromptTemplate.fromTemplate(introSentence);
 
 type ChainProps = {
   theme: string;
@@ -53,7 +51,7 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
   const powerpoint = new DynamicStructuredTool({
     name: "powerpoint_generator",
     description:
-      "call this to Generates a powerpoint presentation, it doesn't provide links and images.",
+      "usefull to generates a powerpoint presentation, it doesn't provide links and images.",
     func: async (toolInput) => generatePPT({ content: toolInput }),
     schema,
   });
@@ -72,30 +70,32 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
 
   const chatPrompt = ChatPromptTemplate.fromMessages([
     systemMessage,
-    promptIntro,
+    new MessagesPlaceholder("agent_scratchpad"),
   ]);
   const model = new ChatOpenAI({
     modelName: "gpt-3.5-turbo-0613",
     temperature: 0,
     openAIApiKey: import.meta.env.VITE_OPENAI_API_KEY,
   });
-  const executor = await initializeAgentExecutorWithOptions(
-    [powerpoint, searchTool, searchImageTool],
-    model,
-    {
-      agentType: "openai-functions",
-      verbose: false,
-      callbacks: [new MyCallbackHandler(setChat)],
-      memory: new BufferMemory({
-        memoryKey: "chat_history",
-        returnMessages: true,
-      }),
-    }
-  );
 
-  const subjectPlan = await chatPrompt.format({ subject: theme });
-  console.log(subjectPlan);
-  await executor.run(subjectPlan);
+  const agent = await createOpenAIFunctionsAgent({
+    llm: model,
+    tools: [powerpoint, searchTool, searchImageTool],
+    prompt: chatPrompt,
+  });
+  const agentExecutor = new AgentExecutor({
+    agent,
+    tools: [powerpoint, searchTool, searchImageTool],
+    callbacks: [new MyCallbackHandler(setChat)],
+    verbose: true,
+    memory: new BufferMemory({
+      memoryKey: "chat_history",
+      returnMessages: true,
+    }),
+  });
+  const input = await promptIntro.format({ input: theme });
+  const result = await agentExecutor.invoke({ input });
+  console.log(result);
 };
 
 /**
