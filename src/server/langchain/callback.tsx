@@ -4,7 +4,7 @@ import { Serialized } from "langchain/load/serializable";
 import {
   AgentAction,
   AgentFinish,
-  BaseChatMessage,
+  BaseMessage,
   ChainValues,
   LLMResult,
   MessageType,
@@ -32,7 +32,7 @@ export class MyCallbackHandler extends BaseCallbackHandler {
       previousValue.concat({ text: inputs["input"], type: "human" })
     );
   }
-  async handleChatModelStart(llm: Serialized, prompts: BaseChatMessage[][]) {
+  async handleChatModelStart(llm: Serialized, prompts: BaseMessage[][]) {
     console.log(`🧠 ChatModelStart: ${llm.id}: ${prompts}`);
     this.setChat((previousValue) =>
       previousValue.concat({ text: prompts.toString(), type: "ai" })
@@ -51,8 +51,9 @@ export class MyCallbackHandler extends BaseCallbackHandler {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleChainEnd(_output: ChainValues) {
-    //console.log("Finished chain.");
+    console.log("Finished chain.");
   }
 
   async handleToolStart(tool: Serialized) {
@@ -64,8 +65,8 @@ export class MyCallbackHandler extends BaseCallbackHandler {
       previousValue.concat({
         text: (
           <>
-            {action.tool} {/* @ts-ignore*/}
-            <pre style={{ "text-wrap": "wrap" }}>
+            {action.tool}
+            <pre style={{ textWrap: "wrap" }}>
               {JSON.stringify(action.toolInput)}
             </pre>
           </>
@@ -75,8 +76,8 @@ export class MyCallbackHandler extends BaseCallbackHandler {
     );
   }
 
-  async handleToolEnd(_output: string) {
-    //console.log(`🤖 toolEnd: ${output}`);
+  async handleToolEnd(output: string) {
+    console.log(`🤖 toolEnd: ${output}`);
   }
 
   async handleText(text: string) {

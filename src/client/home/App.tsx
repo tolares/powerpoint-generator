@@ -67,8 +67,7 @@ function App() {
               sx={{ mt: 2, pY: 2, textAlign: "left", backgroundColor: "grey" }}
             >
               {convertMessageTypeToEmoji(item.type)}
-              {/* @ts-ignore*/}
-              <pre style={{ "text-wrap": "wrap" }}>{item.text}</pre>
+              <pre style={{ textWrap: "wrap" }}>{item.text}</pre>
             </Card>
           </Grid>
         </Grid>
