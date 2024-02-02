@@ -1,27 +1,28 @@
-import { ChatOpenAI } from "langchain/chat_models/openai";
+import { ChatOpenAI } from "@langchain/openai";
 import {
   ChatPromptTemplate,
   HumanMessagePromptTemplate,
   MessagesPlaceholder,
-  SystemMessagePromptTemplate,
 } from "langchain/prompts";
-import { DynamicStructuredTool, DynamicTool, Serper } from "langchain/tools";
+import { DynamicStructuredTool, DynamicTool } from "langchain/tools";
+import { Serper } from "@langchain/community/tools/serper";
 import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
 import { generatePPT } from "./powerpoint.js";
 import { MyCallbackHandler } from "./callback.js";
 import { Dispatch, SetStateAction } from "react";
-import { MessageType } from "langchain/schema";
+import { MessageType, SystemMessage } from "@langchain/core/messages";
 import { z } from "zod";
 import { BufferMemory } from "langchain/memory";
 
-const systemMessage = SystemMessagePromptTemplate.fromTemplate(`
+const systemMessage = `
 You are an assistant for a school teacher.
-Search informations thanks to searper (you must include the links of your source) in order to create at least an introduction, 4 sections and a conclusion on the topic that the user will provide you.
+You have access to the serper tool to search informations thanks to serper (you must include the links of your source) in order to create at least an introduction, 4 sections and a conclusion on the topic that the user will provide you.
+You have access to the powerpoint_generator tool to generate a powerpoint presentation based on the informations you found.
+You will provide a main title for the presentation.
   Provide titles and include 3-5 bullet points which give a brief explanation of each title, develop each dot point for at least 150 words by including things like figures, context, sources etc. I want you to be precise.
   Based on all the titles and dot points generate a powerpoint presentation you must include links to sources and links to images in the final powerpoint.
-  
-  You must provide at the end a powerpoint presentation
-  `);
+  You must provide at the end a powerpoint presentation.
+  `;
 const introSentence = `I would like to create a powerpoint presentation on the topic {input}.`;
 const promptIntro = HumanMessagePromptTemplate.fromTemplate(introSentence);
 
@@ -32,6 +33,7 @@ type ChainProps = {
   >;
 };
 const schema = z.object({
+  mainTitle: z.string(),
   sections: z.array(
     z.object({
       title: z.string(),
@@ -61,17 +63,13 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
       "useful for when you need to ask with search. input should be a string of the search term",
     func: (input) => search.call(input),
   });
-  const searchImageTool = new DynamicTool({
-    name: "search_serper_image",
-    description:
-      "useful for when you need to ask with search images. input should be a string of the search term",
-    func: (input) => search.call(input),
-  });
-
   const chatPrompt = ChatPromptTemplate.fromMessages([
-    systemMessage,
+    new SystemMessage(systemMessage),
+    new MessagesPlaceholder("chat_history"),
+    promptIntro,
     new MessagesPlaceholder("agent_scratchpad"),
   ]);
+
   const model = new ChatOpenAI({
     modelName: "gpt-3.5-turbo-0613",
     temperature: 0,
@@ -80,12 +78,12 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
 
   const agent = await createOpenAIFunctionsAgent({
     llm: model,
-    tools: [powerpoint, searchTool, searchImageTool],
+    tools: [powerpoint, searchTool],
     prompt: chatPrompt,
   });
   const agentExecutor = new AgentExecutor({
     agent,
-    tools: [powerpoint, searchTool, searchImageTool],
+    tools: [powerpoint, searchTool],
     callbacks: [new MyCallbackHandler(setChat)],
     verbose: true,
     memory: new BufferMemory({
@@ -93,20 +91,19 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
       returnMessages: true,
     }),
   });
-  const input = await promptIntro.format({ input: theme });
-  const result = await agentExecutor.invoke({ input });
+  const result = await agentExecutor.invoke({ input: theme, chat_history: [] });
   console.log(result);
 };
 
 /**
 
 
-import { ChatOpenAI } from "langchain/chat_models/openai";
+import { ChatOpenAI } from "@langchain/openai";
 import {
   ChatPromptTemplate,
   HumanMessagePromptTemplate,
   PromptTemplate,
-} from "langchain/prompts";
+} from "@langchain/core/prompts";
 import { DynamicStructuredTool, DynamicTool, Serper } from "langchain/tools";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { generatePPT } from "./powerpoint.js";

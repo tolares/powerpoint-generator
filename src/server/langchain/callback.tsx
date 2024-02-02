@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { BaseCallbackHandler } from "langchain/callbacks";
+import { BaseCallbackHandler } from "@langchain/core/callbacks/base";
 import { Serialized } from "langchain/load/serializable";
 import {
   AgentAction,
@@ -29,7 +28,10 @@ export class MyCallbackHandler extends BaseCallbackHandler {
 
   async handleChainStart(_chain: Serialized, inputs: ChainValues) {
     this.setChat((previousValue) =>
-      previousValue.concat({ text: inputs["input"], type: "human" })
+      previousValue.concat({
+        text: `I would like to create a powerpoint presentation on the topic ${inputs["input"]}.`,
+        type: "human",
+      })
     );
   }
   async handleChatModelStart(llm: Serialized, prompts: BaseMessage[][]) {
@@ -51,13 +53,11 @@ export class MyCallbackHandler extends BaseCallbackHandler {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleChainEnd(_output: ChainValues) {
-    console.log("Finished chain.");
-  }
-
   async handleToolStart(tool: Serialized) {
     console.log(`🤖: Calling ${tool.id}`);
+    this.setChat((previousValue) =>
+      previousValue.concat({ text: `Calling ${tool.id}`, type: "function" })
+    );
   }
 
   async handleAgentAction(action: AgentAction) {
