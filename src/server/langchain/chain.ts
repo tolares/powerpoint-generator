@@ -10,9 +10,9 @@ import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
 import { generatePPT } from "./powerpoint.js";
 import { MyCallbackHandler } from "./callback.js";
 import { Dispatch, SetStateAction } from "react";
-import { MessageType, SystemMessage } from "@langchain/core/messages";
 import { z } from "zod";
 import { BufferMemory } from "langchain/memory";
+import { MessageType, SystemMessage } from "langchain/schema";
 
 const systemMessage = `
 You are an assistant for a school teacher.
@@ -65,7 +65,6 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
   });
   const chatPrompt = ChatPromptTemplate.fromMessages([
     new SystemMessage(systemMessage),
-    new MessagesPlaceholder("chat_history"),
     promptIntro,
     new MessagesPlaceholder("agent_scratchpad"),
   ]);
@@ -91,7 +90,7 @@ export const chain = async ({ theme, setChat }: ChainProps) => {
       returnMessages: true,
     }),
   });
-  const result = await agentExecutor.invoke({ input: theme, chat_history: [] });
+  const result = await agentExecutor.invoke({ input: theme });
   console.log(result);
 };
 
