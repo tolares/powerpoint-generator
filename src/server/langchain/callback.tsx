@@ -11,8 +11,8 @@ import {
 import React from "react";
 import { Dispatch, SetStateAction } from "react";
 
-export class MyCallbackHandler extends BaseCallbackHandler {
-  name = "MyCallbackHandler";
+export class ChatCallbackHandler extends BaseCallbackHandler {
+  name = "ChatCallbackHandler";
 
   setChat: Dispatch<
     SetStateAction<{ text: React.ReactNode; type: MessageType }[]>

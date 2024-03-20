@@ -1,16 +1,27 @@
 import PptxGenJS from "pptxgenjs";
+import { z } from "zod";
+
+export const schema = z.object({
+  mainTitle: z.string(),
+  sections: z.array(
+    z.object({
+      title: z.string(),
+      content: z.array(z.string()),
+      images: z.array(z.string()),
+      sources: z.array(
+        z.object({
+          url: z.string().url(),
+          title: z.string(),
+        })
+      ),
+    })
+  ),
+});
+
 export const generatePPT = ({
   content,
 }: {
-  content?: {
-    mainTitle: string;
-    sections: {
-      title: string;
-      content: string[];
-      sources: { url: string; title: string }[];
-      images: string[];
-    }[];
-  };
+  content?: z.infer<typeof schema>;
 }): string => {
   if (!content) return "no content provided";
   const pres = new PptxGenJS();
@@ -46,6 +57,20 @@ export const generatePPT = ({
             w: 12,
             h: 5.25,
             align: "left",
+          },
+          text: "Placeholder Text",
+        },
+      },
+      {
+        placeholder: {
+          options: {
+            name: "source",
+            type: "body",
+            x: "50%",
+            y: "95%",
+            w: "45%",
+            align: "right",
+            fontSize: 10,
           },
           text: "Placeholder Text",
         },
@@ -86,8 +111,9 @@ export const generatePPT = ({
   content?.sections.forEach((section) => {
     const slide = pres.addSlide({ masterName: "MASTER_SLIDE" });
     const textboxText = section.title;
-    const textboxOpts = { placeholder: "title" };
-    slide.addText(textboxText, textboxOpts);
+    slide.addText(textboxText, { placeholder: "title" });
+    if (section.sources)
+      slide.addText(section.sources[0].url, { placeholder: "source" });
     const bulletPoints = section.content.map((content) => {
       return {
         text: content,
