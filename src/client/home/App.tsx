@@ -1,27 +1,26 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { useState } from "react";
-import reactLogo from "../../assets/ppt.svg";
-import "./App.css";
-import { Button, Card, Grid, TextField, Typography } from "@mui/material";
-import { chain } from "../../server/langchain/chain";
-import { MessageType } from "langchain/schema";
-import React from "react";
+import { useState } from 'react';
+import reactLogo from '../../assets/ppt.svg';
+import './App.css';
+import { Button, Card, Grid, TextField, Typography } from '@mui/material';
+import { chain } from '../../server/langchain/chain';
+import { MessageType } from 'langchain/schema';
+import React from 'react';
 
 const convertMessageTypeToEmoji = (type: MessageType) => {
   switch (type) {
-    case "ai":
-      return "🧠";
-    case "human":
-      return "🧑‍💻";
-    case "function":
-      return "🤖";
+    case 'ai':
+      return '🧠';
+    case 'human':
+      return '🧑‍💻';
+    case 'function':
+      return '🤖';
     default:
-      return "ℹ️";
+      return 'ℹ️';
   }
 };
 
 function App() {
-  const [theme, setTheme] = useState("");
+  const [theme, setTheme] = useState('');
   const [chat, setChat] = useState<
     { text: React.ReactNode; type: MessageType }[]
   >([]);
@@ -60,14 +59,14 @@ function App() {
           key={index}
           container
           rowSpacing={2}
-          direction={item.type === "human" ? "row" : "row-reverse"}
+          direction={item.type === 'human' ? 'row' : 'row-reverse'}
         >
           <Grid item xs={7}>
             <Card
-              sx={{ mt: 2, pY: 2, textAlign: "left", backgroundColor: "grey" }}
+              sx={{ mt: 2, pY: 2, textAlign: 'left', backgroundColor: 'grey' }}
             >
               {convertMessageTypeToEmoji(item.type)}
-              <pre style={{ textWrap: "wrap" }}>{item.text}</pre>
+              <pre style={{ textWrap: 'wrap' }}>{item.text}</pre>
             </Card>
           </Grid>
         </Grid>
