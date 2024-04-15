@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import pptLogo from '../../assets/ppt.svg';
+import pptLogo from '../assets/ppt.svg';
 import './App.css';
 import { Button, Card, Grid, TextField, Typography } from '@mui/material';
 import { chain } from '../server/langchain/chain';
