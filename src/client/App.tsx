@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import reactLogo from '../../assets/ppt.svg';
+import pptLogo from '../../assets/ppt.svg';
 import './App.css';
 import { Button, Card, Grid, TextField, Typography } from '@mui/material';
-import { chain } from '../../server/langchain/chain';
+import { chain } from '../server/langchain/chain';
 import { MessageType } from 'langchain/schema';
 import React from 'react';
 
@@ -28,7 +28,7 @@ function App() {
   return (
     <Grid container rowSpacing={2}>
       <Grid item xs={12}>
-        <img src={reactLogo} className="logo react" alt="React logo" />
+        <img src={pptLogo} className="logo" alt="Powerpoint logo" />
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h2" fontWeight={600}>
